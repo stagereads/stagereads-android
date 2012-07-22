@@ -1,4 +1,4 @@
-package com.econify.subscriptionreader.fragments;
+package com.econify.stagereads.fragments;
 
 import android.support.v4.app.Fragment;
 

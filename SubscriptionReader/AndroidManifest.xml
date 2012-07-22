@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.econify.subscriptionreader"
+          package="com.econify.stagereads"
           android:versionCode="1"
           android:versionName="1.0">
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="16"/>
+    <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher" android:theme="@style/Theme.Sherlock">
         <activity android:name="Main"
                   android:label="@string/app_name">
@@ -12,5 +15,16 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <service android:name="BillingService" />
+
+        <receiver android:name="BillingReceiver">
+            <intent-filter>
+                <action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+                <action android:name="com.android.vending.billing.RESPONSE_CODE" />
+                <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>

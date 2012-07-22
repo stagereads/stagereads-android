@@ -1,11 +1,11 @@
-package com.econify.subscriptionreader;
+package com.econify.stagereads;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.econify.subscriptionreader.fragments.ReadFragment;
-import com.econify.subscriptionreader.fragments.ShopFragment;
+import com.econify.stagereads.fragments.ReadFragment;
+import com.econify.stagereads.fragments.ShopFragment;
 
 public class Main extends SherlockFragmentActivity implements ActionBar.TabListener {
 

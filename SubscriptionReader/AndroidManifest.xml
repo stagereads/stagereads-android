@@ -4,10 +4,12 @@
           android:versionCode="1"
           android:versionName="1.0">
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="16"/>
-    <uses-permission android:name="com.android.vending.BILLING" />
+    <uses-permission android:name="com.android.vending.BILLING"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <application android:label="@string/app_name" android:icon="@drawable/ic_launcher" android:theme="@style/Theme.Sherlock">
+    <application android:label="@string/app_name"
+                 android:icon="@drawable/ic_launcher"
+                 android:theme="@style/Theme.Sherlock">
         <activity android:name="Main"
                   android:label="@string/app_name">
             <intent-filter>
@@ -16,13 +18,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name="BillingService" />
+        <service android:name=".shop.BillingService"/>
 
-        <receiver android:name="BillingReceiver">
+        <receiver android:name=".shop.BillingReceiver">
             <intent-filter>
-                <action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
-                <action android:name="com.android.vending.billing.RESPONSE_CODE" />
-                <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+                <action android:name="com.android.vending.billing.IN_APP_NOTIFY"/>
+                <action android:name="com.android.vending.billing.RESPONSE_CODE"/>
+                <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED"/>
             </intent-filter>
         </receiver>
 

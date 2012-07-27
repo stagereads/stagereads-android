@@ -4,10 +4,12 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import android.util.Log;
 import net.sqlcipher.database.SQLiteDatabase;
 
 public class ShopDB {
@@ -33,7 +35,7 @@ public class ShopDB {
             instance.mDatabase = SQLiteDatabase.openOrCreateDatabase(dbPath,
                     "password", null);
             instance.mDatabase
-                    .execSQL("CREATE TABLE IF NOT EXISTS subscriptions(id INT UNIQUE, hashed_resource STRING, name STRING, description STRING, url STRING, purchased INT DEFAULT 0, updated int, created int)");
+                    .execSQL("CREATE TABLE IF NOT EXISTS periodicals(_id INT UNIQUE, hashed_resource STRING, name STRING, description STRING, url STRING, updated int, created int, downloaded INT DEFAULT 0)");
 
             int version = instance.mDatabase.getVersion();
             if (version < 2) {
@@ -56,7 +58,7 @@ public class ShopDB {
 
     public void insertPurchase(int id, String hashed_resource, String name, String description, String url, long updated, long created) {
         mDatabase
-                .execSQL("INSERT OR REPLACE INTO subscriptions (id, hashed_resource, name, description, url, purchased, updated, created) VALUES ("
+                .execSQL("INSERT OR REPLACE INTO periodicals (_id, hashed_resource, name, description, url, updated, created, downloaded) VALUES ("
                         + id
                         + ", '"
                         + hashed_resource
@@ -67,24 +69,27 @@ public class ShopDB {
                         + "', '"
                         + url
                         + "', "
-                        + "(SELECT purchased from subscriptions where id = "
-                        + id + ")"
-                        + ", "
                         + updated
                         + ", "
                         + created
+                        + ", "
+                        + "(SELECT downloaded from periodicals where _id = "
+                        + id + ")"
                         + ")");
     }
 
-    public int updatePurchase(int productId) {
-
-        ContentValues values = new ContentValues();
-        values.put("purchased", 1);
-        return mDatabase.update("purchases", values, "id=" + productId,
-                null);
+    public Cursor getPeriodicals() {
+            return mDatabase.rawQuery("SELECT * FROM periodicals", null);
     }
 
-    public Cursor getSubscriptions() {
-            return mDatabase.rawQuery("SELECT * FROM subscriptions", null);
+    public Cursor getDownloadedPeriodicals() {
+        return mDatabase.rawQuery("SELECT * FROM periodicals WHERE downloaded = 1", null);
+    }
+
+    public void setDownloaded(long id) {
+        ContentValues values = new ContentValues();
+        values.put("downloaded", 1);
+        int result = mDatabase.update("periodicals", values, "_id = ?", new String[]{"" + id});
+        Log.d("", "" + result);
     }
 }

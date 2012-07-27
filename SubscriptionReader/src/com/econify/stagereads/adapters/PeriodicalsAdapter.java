@@ -1,10 +1,5 @@
 package com.econify.stagereads.adapters;
 
-import android.text.style.UpdateAppearance;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
@@ -14,19 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-public class ShopAdapter implements ListAdapter {
+public class PeriodicalsAdapter implements ListAdapter {
 
-    private Context mContext;
     private Cursor mCursor;
     private LayoutInflater mInflater;
 
-    public ShopAdapter(Context context, Cursor cursor) {
-        mContext = context;
+    public PeriodicalsAdapter(Context context, Cursor cursor) {
         mCursor = cursor;
 
-        if (context != null) {
-            mInflater = LayoutInflater.from(context);
-        }
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -42,7 +33,8 @@ public class ShopAdapter implements ListAdapter {
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        mCursor.moveToPosition(position);
+        return mCursor.getLong(mCursor.getColumnIndex("_id"));
     }
 
     @Override
@@ -80,6 +72,9 @@ public class ShopAdapter implements ListAdapter {
         String name = mCursor.getString(mCursor.getColumnIndex("name"));
         holder.text1.setText(name);
 
+        long id = mCursor.getLong(mCursor.getColumnIndex("_id"));
+        holder.text2.setText("" + id);
+
         return convertView;
     }
 
@@ -90,7 +85,7 @@ public class ShopAdapter implements ListAdapter {
 
     @Override
     public boolean hasStableIds() {
-        return false;
+        return true;
     }
 
     @Override

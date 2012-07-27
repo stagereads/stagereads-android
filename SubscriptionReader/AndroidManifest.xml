@@ -18,6 +18,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="PlayReader" />
+
         <service android:name=".shop.BillingService"/>
 
         <receiver android:name=".shop.BillingReceiver">

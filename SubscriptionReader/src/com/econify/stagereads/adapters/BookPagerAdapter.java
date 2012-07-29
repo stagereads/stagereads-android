@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +55,8 @@ public class BookPagerAdapter extends FragmentPagerAdapter {
             WebView webView = (WebView) view.findViewById(R.id.webview);
 
             try {
-                webView.loadData(new String(page.getData()), "text/html", null);
+                String pageData = new String(page.getData());
+                webView.loadData(pageData, "text/html", null);
             } catch (IOException e) {
                 e.printStackTrace();
             }

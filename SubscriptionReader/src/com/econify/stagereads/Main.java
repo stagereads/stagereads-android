@@ -102,8 +102,7 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     }
 
     private void updatePeriodicalLists() {
-        mReadFragment.updateBooks(this, mShopDB.getDownloadedPeriodicals());
-        mShopFragment.updateBooks(this, mShopDB.getPeriodicals());
+        mReadFragment.updateBooks(this, mShopDB.getPeriodicals());
     }
 
     private void InitializeSQLCipher() {

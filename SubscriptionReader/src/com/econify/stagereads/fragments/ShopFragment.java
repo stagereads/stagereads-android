@@ -1,70 +1,26 @@
 package com.econify.stagereads.fragments;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ListView;
-import com.econify.stagereads.Main;
+import android.view.ViewGroup;
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.app.SherlockListFragment;
+import com.econify.stagereads.R;
 import com.econify.stagereads.shop.BillingService;
 
-import java.io.BufferedInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
-public class ShopFragment extends AbstractTabFragment {
+public class ShopFragment extends SherlockFragment {
 
     BillingService mBillingService;
 
     ProgressDialog mProgressDialog;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        View view = inflater.inflate(R.layout.shopfragment, null);
 
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, final long id) {
-        Cursor item = (Cursor) getListAdapter().getItem(position);
-
-        int downloaded = item.getInt(item.getColumnIndex("downloaded"));
-        final String url = item.getString(item.getColumnIndex("url"));
-        String name = item.getString(item.getColumnIndex("name"));
-        String description = item.getString(item.getColumnIndex("description"));
-
-        // Check if the user already owns the item
-        if (downloaded < 1) {
-
-            Dialog dialog = new AlertDialog.Builder(getActivity())
-                    .setTitle(name)
-                    .setMessage(description)
-                    .setPositiveButton("Download", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ((Main) getActivity()).downloadPlay(id, url);
-                            dialogInterface.dismiss();
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    })
-                    .create();
-            dialog.show();
-
-        }
-
+        return view;
     }
 }

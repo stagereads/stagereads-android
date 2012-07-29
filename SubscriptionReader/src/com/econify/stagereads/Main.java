@@ -12,6 +12,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.econify.stagereads.adapters.PeriodicalsAdapter;
 import com.econify.stagereads.fragments.ReadFragment;
 import com.econify.stagereads.fragments.ShopFragment;
+import com.econify.stagereads.shop.BillingService;
 import com.econify.stagereads.shop.ShopClient;
 import com.econify.stagereads.shop.ShopDB;
 import org.joda.time.DateTime;
@@ -28,6 +29,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 public class Main extends SherlockFragmentActivity implements ActionBar.TabListener {
+
+    BillingService mBillingService;
 
     ActionBar.Tab readTab;
     ReadFragment mReadFragment;
@@ -69,6 +72,11 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
 
         InitializeSQLCipher();
         mShopClient = ShopClient.initShopClient();
+
+        mBillingService = new BillingService();
+        mBillingService.setContext(this);
+
+        mShopFragment.setBillingService(mBillingService);
     }
 
     @Override

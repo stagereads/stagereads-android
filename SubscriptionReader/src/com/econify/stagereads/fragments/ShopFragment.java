@@ -20,7 +20,7 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
 
     BillingService mBillingService;
 
-    boolean mSubscribed;
+    boolean mSubscribed = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

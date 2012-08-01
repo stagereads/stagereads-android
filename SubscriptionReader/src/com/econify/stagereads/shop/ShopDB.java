@@ -1,16 +1,12 @@
 package com.econify.stagereads.shop;
 
-import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-
 import android.util.Log;
 import net.sqlcipher.database.SQLiteDatabase;
+
+import java.io.File;
 
 public class ShopDB {
 
@@ -36,7 +32,8 @@ public class ShopDB {
                     "password", null);
             instance.mDatabase
                     .execSQL("CREATE TABLE IF NOT EXISTS periodicals(_id INT UNIQUE, hashed_resource STRING, name STRING, description STRING, url STRING, updated int, created int, downloaded INT DEFAULT 0)");
-
+            instance.mDatabase
+                    .execSQL("CREATE TABLE IF NOT EXISTS subscription(_id STRING UNIQUE, subscribed INT DEFAULT 0)");
             int version = instance.mDatabase.getVersion();
             if (version < 2) {
                 instance.mDatabase.setVersion(2);
@@ -79,7 +76,7 @@ public class ShopDB {
     }
 
     public Cursor getPeriodicals() {
-            return mDatabase.rawQuery("SELECT * FROM periodicals", null);
+        return mDatabase.rawQuery("SELECT * FROM periodicals", null);
     }
 
     public Cursor getDownloadedPeriodicals() {
@@ -92,4 +89,31 @@ public class ShopDB {
         int result = mDatabase.update("periodicals", values, "_id = ?", new String[]{"" + id});
         Log.d("", "" + result);
     }
+
+    public boolean isSubscribed(String id) {
+        Cursor c = mDatabase.rawQuery("SELECT * FROM subscription WHERE _id = '" + id + "'", null);
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+            int value = c.getInt(c.getColumnIndex("subscribed"));
+            return value > 0;
+        }
+        return false;
+    }
+
+    public void setSubscribed(String id) {
+        setSubscribed(id, 1);
+    }
+
+    public void setUnsubscribed(String id) {
+        setSubscribed(id, 0);
+    }
+
+    public void setSubscribed(String id, int value) {
+        mDatabase.execSQL("INSERT OR REPLACE INTO subscription (_id, subscribed) VALUES ("
+                + id
+                + ", "
+                + value
+                + ")");
+    }
+
 }

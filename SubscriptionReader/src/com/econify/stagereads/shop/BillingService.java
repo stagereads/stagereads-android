@@ -179,7 +179,7 @@ public class BillingService extends Service implements ServiceConnection {
      * Developers may want to perform two checks if both one-time and subscription products are
      * available.
      */
-    class CheckBillingSupported extends BillingRequest {
+    public class CheckBillingSupported extends BillingRequest {
         public String mProductType = null;
 
         /** Legacy contrustor
@@ -232,7 +232,7 @@ public class BillingService extends Service implements ServiceConnection {
     /**
      * Wrapper class that requests a purchase.
      */
-    class RequestPurchase extends BillingRequest {
+    public class RequestPurchase extends BillingRequest {
         public final String mProductId;
         public final String mDeveloperPayload;
         public final String mProductType;
@@ -362,7 +362,7 @@ public class BillingService extends Service implements ServiceConnection {
     /**
      * Wrapper class that sends a RESTORE_TRANSACTIONS message to the server.
      */
-    class RestoreTransactions extends BillingRequest {
+    public class RestoreTransactions extends BillingRequest {
         long mNonce;
 
         public RestoreTransactions() {

@@ -10,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import com.econify.stagereads.R;
+import com.google.common.collect.Table;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.domain.TableOfContents;
 
 import java.io.IOException;
 import java.util.List;

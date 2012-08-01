@@ -26,6 +26,8 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
 
     boolean mSubscribed = false;
 
+    SubscriptionPurchaseObserver mObserver;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -42,8 +44,15 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
         super.onResume();
 
         Handler mHandler = new Handler();
-        SubscriptionPurchaseObserver observer = new SubscriptionPurchaseObserver(mHandler);
-        ResponseHandler.register(observer);
+        mObserver = new SubscriptionPurchaseObserver(mHandler);
+        ResponseHandler.register(mObserver);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        ResponseHandler.unregister(mObserver);
     }
 
     @Override
@@ -107,6 +116,7 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
             }
 
             if (purchaseState == Consts.PurchaseState.PURCHASED) {
+
                 //mOwnedItems.add(itemId);
 
                 // If this is a subscription, then enable the "Edit

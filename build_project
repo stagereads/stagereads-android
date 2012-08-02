@@ -1,0 +1,5 @@
+android update project -p ./SubscriptionReader -s
+
+android update project -p ./ActionBarSherlock/library
+
+ant debug -buildfile ./SubscriptionReader/build.xml 

@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.econify.stagereads.Main;
 import com.econify.stagereads.PlayReader;
@@ -19,15 +20,13 @@ import java.net.URL;
 
 public class ReadFragment extends SherlockListFragment {
 
-    private boolean isReady = false;
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
     }
+
 
     public void updateBooks(Context context, Cursor cursor) {
         PeriodicalsAdapter adapter = new PeriodicalsAdapter(context, cursor);
@@ -44,8 +43,9 @@ public class ReadFragment extends SherlockListFragment {
         String name = item.getString(item.getColumnIndex("name"));
         String description = item.getString(item.getColumnIndex("description"));
 
-        // Check if the user already owns the item
-        if (downloaded < 1) {
+        if (!((Main)getActivity()).isSubscribed()) {
+            Toast.makeText(getActivity(), "To read this play head over to the subscribe tab.", Toast.LENGTH_SHORT).show();
+        } else if (downloaded < 1) {
 
             Dialog dialog = new AlertDialog.Builder(getActivity())
                     .setTitle(name)

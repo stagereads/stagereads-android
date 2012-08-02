@@ -46,7 +46,8 @@ public class Consts {
         // Responses to requestPurchase or restoreTransactions.
         PURCHASED,   // User was charged for the order.
         CANCELED,    // The charge failed on the server.
-        REFUNDED;    // User received a refund for the order.
+        REFUNDED,    // User received a refund for the order.
+        EXPIRED;
 
         // Converts from an ordinal value to the PurchaseState
         public static PurchaseState valueOf(int index) {

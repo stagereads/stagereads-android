@@ -73,7 +73,7 @@ public class PeriodicalsAdapter implements ListAdapter {
         holder.text1.setText(name);
 
         int downloaded = mCursor.getInt(mCursor.getColumnIndex("downloaded"));
-        holder.text2.setText("" + downloaded);
+        holder.text2.setText((downloaded > 0) ? "Downloaded" : "Available");
 
         return convertView;
     }

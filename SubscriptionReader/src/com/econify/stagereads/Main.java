@@ -5,16 +5,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.widget.ListAdapter;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.econify.stagereads.adapters.PeriodicalsAdapter;
 import com.econify.stagereads.fragments.ReadFragment;
 import com.econify.stagereads.fragments.ShopFragment;
-import com.econify.stagereads.shop.BillingService;
-import com.econify.stagereads.shop.ShopClient;
-import com.econify.stagereads.shop.ShopDB;
+import com.econify.stagereads.shop.*;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -43,6 +43,10 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     ShopDB mShopDB;
 
     ProgressDialog mProgressDialog;
+
+    boolean mSubscribed = false;
+
+    SubscriptionPurchaseObserver mObserver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,13 +108,28 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     public void onResume() {
         super.onResume();
 
+        Handler mHandler = new Handler();
+        mObserver = new SubscriptionPurchaseObserver(mHandler);
+        ResponseHandler.register(mObserver);
+
         updatePeriodicalLists();
 
         new LoadItems().execute();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        ResponseHandler.unregister(mObserver);
+    }
+
     private void updatePeriodicalLists() {
         mReadFragment.updateBooks(this, mShopDB.getPeriodicals());
+    }
+
+    public boolean isSubscribed() {
+         return mSubscribed;
     }
 
     private void InitializeSQLCipher() {
@@ -253,6 +272,94 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
         protected void onProgressUpdate(Integer... progress) {
             super.onProgressUpdate(progress);
             mProgressDialog.setProgress(progress[0]);
+        }
+    }
+
+    /**
+     * A {@link com.econify.stagereads.shop.PurchaseObserver} is used to get callbacks when Android Market sends
+     * messages to this application so that we can update the UI.
+     */
+    private class SubscriptionPurchaseObserver extends PurchaseObserver {
+        public SubscriptionPurchaseObserver(Handler handler) {
+            super(Main.this, handler);
+        }
+
+        @Override
+        public void onBillingSupported(boolean supported, String type) {
+            if (Consts.DEBUG) {
+                Log.i("", "supported: " + supported);
+            }
+            if (type == null || type.equals(Consts.ITEM_TYPE_INAPP)) {
+                if (supported) {
+                    //restoreDatabase();
+                    //mBuyButton.setEnabled(true);
+                    //mEditPayloadButton.setEnabled(true);
+                } else {
+                    //showDialog(DIALOG_BILLING_NOT_SUPPORTED_ID);
+                }
+            } else if (type.equals(Consts.ITEM_TYPE_SUBSCRIPTION)) {
+                //mCatalogAdapter.setSubscriptionsSupported(supported);
+            } else {
+                //showDialog(DIALOG_SUBSCRIPTIONS_NOT_SUPPORTED_ID);
+            }
+        }
+
+        @Override
+        public void onPurchaseStateChange(Consts.PurchaseState purchaseState, String itemId,
+                                          int quantity, long purchaseTime, String developerPayload) {
+            if (Consts.DEBUG) {
+                Log.i("", "onPurchaseStateChange() itemId: " + itemId + " " + purchaseState);
+            }
+
+            if (developerPayload == null) {
+                //logProductActivity(itemId, purchaseState.toString());
+            } else {
+                //logProductActivity(itemId, purchaseState + "\n\t" + developerPayload);
+            }
+        }
+
+        @Override
+        public void onRequestPurchaseResponse(BillingService.RequestPurchase request, Consts.ResponseCode
+                responseCode) {
+            if (Consts.DEBUG) {
+                Log.d("", request.mProductId + ": " + responseCode);
+            }
+            if (responseCode == Consts.ResponseCode.RESULT_OK) {
+                if (Consts.DEBUG) {
+                    Log.i("", "purchase was successfully sent to server");
+                }
+                //logProductActivity(request.mProductId, "sending purchase request");
+            } else if (responseCode == Consts.ResponseCode.RESULT_USER_CANCELED) {
+                if (Consts.DEBUG) {
+                    Log.i("", "user canceled purchase");
+                }
+                //logProductActivity(request.mProductId, "dismissed purchase dialog");
+            } else {
+                if (Consts.DEBUG) {
+                    Log.i("", "purchase failed");
+                }
+                //logProductActivity(request.mProductId, "request purchase returned " + responseCode);
+            }
+        }
+
+        @Override
+        public void onRestoreTransactionsResponse(BillingService.RestoreTransactions request,
+                                                  Consts.ResponseCode responseCode) {
+            if (responseCode == Consts.ResponseCode.RESULT_OK) {
+                if (Consts.DEBUG) {
+                    Log.d("", "completed RestoreTransactions request");
+                }
+                // Update the shared preferences so that we don't perform
+                // a RestoreTransactions again.
+                /*SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+              SharedPreferences.Editor edit = prefs.edit();
+              edit.putBoolean(DB_INITIALIZED, true);
+              edit.commit();  */
+            } else {
+                if (Consts.DEBUG) {
+                    Log.d("", "RestoreTransactions error: " + responseCode);
+                }
+            }
         }
     }
 }

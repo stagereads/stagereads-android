@@ -134,6 +134,10 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
 
     private void InitializeSQLCipher() {
         mShopDB = ShopDB.getShopDB(this);
+
+        mSubscribed = mShopDB.isSubscribed("3c2b0083a748dc9cfad7e068e607162521432208");
+        mShopFragment.updateSubscriptionStatus();
+
         Cursor cursor = mShopDB.getDownloadedPeriodicals();
         this.startManagingCursor(cursor);
         ListAdapter adapter = new PeriodicalsAdapter(this, cursor);
@@ -311,11 +315,14 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
                 Log.i("", "onPurchaseStateChange() itemId: " + itemId + " " + purchaseState);
             }
 
-            if (developerPayload == null) {
-                //logProductActivity(itemId, purchaseState.toString());
-            } else {
-                //logProductActivity(itemId, purchaseState + "\n\t" + developerPayload);
+            if (purchaseState == Consts.PurchaseState.EXPIRED) {
+                mSubscribed = false;
             }
+            else if (purchaseState == Consts.PurchaseState.PURCHASED) {
+                mSubscribed = true;
+            }
+
+            mShopFragment.updateSubscriptionStatus();
         }
 
         @Override

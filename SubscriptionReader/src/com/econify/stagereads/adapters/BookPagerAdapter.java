@@ -13,6 +13,7 @@ import com.econify.stagereads.R;
 import com.google.common.collect.Table;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.domain.TableOfContents;
 
 import java.io.IOException;
@@ -28,7 +29,18 @@ public class BookPagerAdapter extends FragmentPagerAdapter {
 
         mBook = book;
 
-        contents = book.getContents();
+        List<TOCReference> references = book.getTableOfContents().getTocReferences();
+
+        for (TOCReference ref : references) {
+            List<TOCReference> ref2 = ref.getChildren();
+            if (ref2 != null && ref2.size() > 0) {
+                for (TOCReference ref3 : ref2) {
+                    contents.add(ref3.getResource());
+                }
+            } else {
+                contents.add(ref.getResource());
+            }
+        }
     }
 
     @Override

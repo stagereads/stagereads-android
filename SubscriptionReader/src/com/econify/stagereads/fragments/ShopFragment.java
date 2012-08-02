@@ -21,8 +21,6 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
 
     BillingService mBillingService;
 
-    boolean mSubscribed = false;
-
     boolean created = false;
 
     @Override
@@ -44,7 +42,7 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
     @Override
     public void onClick(View view) {
         if (view == mSubscribeButton) {
-            if (mSubscribed) {
+            if (((Main) getActivity()).isSubscribed()) {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("market://details?id=com.econify.stagereads"));
                 startActivity(intent);
@@ -56,7 +54,7 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
 
     public void updateSubscriptionStatus() {
         if (created) {
-            if (!((Main) getActivity()).isSubscribed()) {
+            if (((Main) getActivity()).isSubscribed()) {
                 mSubscriptionStatus.setText("Subscribed!");
                 mSubscribeButton.setText("Unsubscribe");
             } else {

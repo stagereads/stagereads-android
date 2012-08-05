@@ -1,3 +1,6 @@
 [submodule "ActionBarSherlock"]
 	path = ActionBarSherlock
 	url = git://github.com/JakeWharton/ActionBarSherlock.git
+[submodule "Android-SVG-Asset-Generator"]
+	path = Android-SVG-Asset-Generator
+	url = git://github.com/DDRBoxman/Android-SVG-Asset-Generator.git

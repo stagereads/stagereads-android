@@ -66,6 +66,7 @@ public class ShopFragment extends SherlockFragment implements View.OnClickListen
 
     public void setBillingService(BillingService billingService) {
         mBillingService = billingService;
+        mBillingService.restoreTransactions();
 
     }
 

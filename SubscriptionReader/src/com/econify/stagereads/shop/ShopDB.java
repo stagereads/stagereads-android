@@ -109,9 +109,9 @@ public class ShopDB {
     }
 
     public void setSubscribed(String id, int value) {
-        mDatabase.execSQL("INSERT OR REPLACE INTO subscription (_id, subscribed) VALUES ("
+        mDatabase.execSQL("INSERT OR REPLACE INTO subscription (_id, subscribed) VALUES ('"
                 + id
-                + ", "
+                + "', "
                 + value
                 + ")");
     }

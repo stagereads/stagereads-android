@@ -4,19 +4,17 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import com.econify.stagereads.R;
-import com.google.common.collect.Table;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.TOCReference;
-import nl.siegmann.epublib.domain.TableOfContents;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookPagerAdapter extends FragmentPagerAdapter {
@@ -28,14 +26,18 @@ public class BookPagerAdapter extends FragmentPagerAdapter {
         super(fm);
 
         mBook = book;
-
+        contents = new ArrayList<Resource>();
         List<TOCReference> references = book.getTableOfContents().getTocReferences();
 
         for (TOCReference ref : references) {
             List<TOCReference> ref2 = ref.getChildren();
             if (ref2 != null && ref2.size() > 0) {
+                String id = "";
                 for (TOCReference ref3 : ref2) {
-                    contents.add(ref3.getResource());
+                    if (ref3.getResource().getId() != id) {
+                        contents.add(ref3.getResource());
+                        id = ref3.getResource().getId();
+                    }
                 }
             } else {
                 contents.add(ref.getResource());

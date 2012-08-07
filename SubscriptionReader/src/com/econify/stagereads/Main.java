@@ -6,7 +6,11 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.widget.ListAdapter;
 import com.actionbarsherlock.app.ActionBar;
@@ -48,9 +52,13 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
 
     SubscriptionPurchaseObserver mObserver;
 
+    ViewPager mViewPager;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.main);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -67,11 +75,35 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
         readTab = actionBar.newTab();
         readTab.setText(R.string.read);
         readTab.setTabListener(this);
-        actionBar.addTab(readTab);
 
         shopTab = actionBar.newTab();
         shopTab.setText(R.string.shop);
         shopTab.setTabListener(this);
+
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mViewPager.setAdapter(new ViewPagerAdapter(getSupportFragmentManager()));
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if (i == 0) {
+                    getSupportActionBar().selectTab(readTab);
+                } else if (i == 1) {
+                    getSupportActionBar().selectTab(shopTab);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+        actionBar.addTab(readTab);
         actionBar.addTab(shopTab);
 
         InitializeSQLCipher();
@@ -87,10 +119,10 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
         if (tab == readTab) {
             tabPos = 0;
-            ft.replace(android.R.id.content, mReadFragment);
+            mViewPager.setCurrentItem(0);
         } else if (tab == shopTab) {
             tabPos = 1;
-            ft.replace(android.R.id.content, mShopFragment);
+            mViewPager.setCurrentItem(1);
         }
     }
 
@@ -129,7 +161,7 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     }
 
     public boolean isSubscribed() {
-         return mSubscribed;
+        return mSubscribed;
     }
 
     private void InitializeSQLCipher() {
@@ -145,7 +177,29 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     }
 
     public void downloadPlay(long id, String url) {
-         new DownloadFile(id).execute(url);
+        new DownloadFile(id).execute(url);
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
+
+        public ViewPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            if (i == 0) {
+                return mReadFragment;
+            } else if (i == 1) {
+                return mShopFragment;
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
     }
 
     private class LoadItems extends AsyncTask<Object, Object, Boolean> {
@@ -317,8 +371,7 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
 
             if (purchaseState == Consts.PurchaseState.EXPIRED) {
                 mSubscribed = false;
-            }
-            else if (purchaseState == Consts.PurchaseState.PURCHASED) {
+            } else if (purchaseState == Consts.PurchaseState.PURCHASED) {
                 mSubscribed = true;
             }
 

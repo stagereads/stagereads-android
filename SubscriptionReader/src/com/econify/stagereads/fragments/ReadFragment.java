@@ -15,9 +15,6 @@ import com.econify.stagereads.Main;
 import com.econify.stagereads.PlayReader;
 import com.econify.stagereads.adapters.PeriodicalsAdapter;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 public class ReadFragment extends SherlockListFragment {
 
     @Override
@@ -38,43 +35,43 @@ public class ReadFragment extends SherlockListFragment {
 
         Cursor item = (Cursor) l.getItemAtPosition(position);
         final String urlString = item.getString(item.getColumnIndex("url"));
+        String hashed_resource = item.getString(item.getColumnIndex("hashed_resource"));
 
         int downloaded = item.getInt(item.getColumnIndex("downloaded"));
         String name = item.getString(item.getColumnIndex("name"));
         String description = item.getString(item.getColumnIndex("description"));
 
-        if (!((Main)getActivity()).isSubscribed()) {
+        if (!((Main) getActivity()).isSubscribed()) {
             Toast.makeText(getActivity(), "To read this play head over to the subscribe tab.", Toast.LENGTH_SHORT).show();
         } else if (downloaded < 1) {
 
-            Dialog dialog = new AlertDialog.Builder(getActivity())
-                    .setTitle(name)
-                    .setMessage(description)
-                    .setPositiveButton("Download", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ((Main) getActivity()).downloadPlay(id, urlString);
-                            dialogInterface.dismiss();
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    })
-                    .create();
-            dialog.show();
+            showDownloadDialog(name, description, id, urlString);
 
         } else {
-            try {
-                URL url = new URL(urlString);
-                Intent intent = new Intent(getActivity(), PlayReader.class);
-                intent.putExtra("book", url.getPath().substring(url.getPath().lastIndexOf('/') + 1));
-                startActivity(intent);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+            Intent intent = new Intent(getActivity(), PlayReader.class);
+            intent.putExtra("bookId", hashed_resource);
+            startActivity(intent);
         }
+    }
+
+    private void showDownloadDialog(String name, String description, final long id, final String urlString) {
+        Dialog dialog = new AlertDialog.Builder(getActivity())
+                .setTitle(name)
+                .setMessage(description)
+                .setPositiveButton("Download", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ((Main) getActivity()).downloadPlay(id, urlString);
+                        dialogInterface.dismiss();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 }

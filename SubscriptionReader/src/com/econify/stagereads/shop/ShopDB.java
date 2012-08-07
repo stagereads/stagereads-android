@@ -35,8 +35,9 @@ public class ShopDB {
             instance.mDatabase
                     .execSQL("CREATE TABLE IF NOT EXISTS subscription(_id STRING UNIQUE, subscribed INT DEFAULT 0)");
             int version = instance.mDatabase.getVersion();
-            if (version < 2) {
-                instance.mDatabase.setVersion(2);
+            if (version < 3) {
+                instance.mDatabase.setVersion(3);
+                instance.mDatabase.execSQL("ALTER TABLE periodicals ADD COLUMN page INT DEFAULT 0");
             }
         }
         return instance;
@@ -55,7 +56,7 @@ public class ShopDB {
 
     public void insertPurchase(int id, String hashed_resource, String name, String description, String url, long updated, long created) {
         mDatabase
-                .execSQL("INSERT OR REPLACE INTO periodicals (_id, hashed_resource, name, description, url, updated, created, downloaded) VALUES ("
+                .execSQL("INSERT OR REPLACE INTO periodicals (_id, hashed_resource, name, description, url, updated, created, downloaded, page) VALUES ("
                         + id
                         + ", '"
                         + hashed_resource
@@ -71,6 +72,8 @@ public class ShopDB {
                         + created
                         + ", "
                         + "(SELECT downloaded from periodicals where _id = "
+                        + id + "), "
+                        + "(SELECT page from periodicals where _id = "
                         + id + ")"
                         + ")");
     }
@@ -116,4 +119,13 @@ public class ShopDB {
                 + ")");
     }
 
+    public Cursor getPeriodicalFromResource(String hashed_resource) {
+       return mDatabase.rawQuery("SELECT * FROM periodicals WHERE hashed_resource = '" + hashed_resource + "'", null);
+    }
+
+    public void setLastPage(String hashed_resource, int page) {
+        ContentValues values = new ContentValues();
+        values.put("page", page);
+        int result = mDatabase.update("periodicals", values, "hashed_resource = ?", new String[]{hashed_resource});
+    }
 }

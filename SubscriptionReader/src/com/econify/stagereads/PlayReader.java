@@ -1,19 +1,27 @@
 package com.econify.stagereads;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.econify.stagereads.adapters.BookPagerAdapter;
+import com.econify.stagereads.shop.ShopDB;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.epub.EpubReader;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class PlayReader extends SherlockFragmentActivity {
 
     ViewPager mViewPager;
+
+    ShopDB mShopDB;
+
+    String mBookId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,30 +29,62 @@ public class PlayReader extends SherlockFragmentActivity {
 
         setContentView(R.layout.bookreader);
 
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
         Intent intent = getIntent();
 
-        if (!intent.hasExtra("book")) {
+        if (!intent.hasExtra("bookId")) {
             finish();
             return;
         }
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mViewPager = (ViewPager) findViewById(R.id.viewpager);
-
-        String bookName = intent.getStringExtra("book");
-        // read epub file
-        EpubReader epubReader = new EpubReader();
-        Book book = null;
+        mBookId = intent.getStringExtra("bookId");
+        mShopDB = ShopDB.getShopDB(this);
+        Cursor c = mShopDB.getPeriodicalFromResource(mBookId);
+        c.moveToFirst();
+        String urlString = c.getString(c.getColumnIndex("url"));
         try {
-            book = epubReader.readEpub(openFileInput(bookName));
+            URL url = new URL(urlString);
 
-            BookPagerAdapter pagerAdapter = new BookPagerAdapter(book, getSupportFragmentManager());
-            mViewPager.setAdapter(pagerAdapter);
+            String bookName = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
+            // read epub file
+            EpubReader epubReader = new EpubReader();
+            Book book = null;
+            try {
+                book = epubReader.readEpub(openFileInput(bookName));
 
-        } catch (IOException e) {
+                BookPagerAdapter pagerAdapter = new BookPagerAdapter(book, getSupportFragmentManager());
+                mViewPager.setAdapter(pagerAdapter);
+
+                int page = c.getInt(c.getColumnIndex("page"));
+                c.close();
+                mViewPager.setCurrentItem(page);
+
+            } catch (IOException e) {
+                c.close();
+                e.printStackTrace();
+                finish();
+            }
+        } catch (MalformedURLException e) {
+            c.close();
+            e.printStackTrace();
             finish();
         }
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        mShopDB.setLastPage(mBookId, mViewPager.getCurrentItem());
     }
 
     @Override

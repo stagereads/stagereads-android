@@ -2,13 +2,11 @@ package com.econify.stagereads.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
@@ -19,7 +17,7 @@ import com.econify.stagereads.PlayReader;
 import com.econify.stagereads.adapters.PeriodicalsAdapter;
 import com.econify.stagereads.loader.PeriodicalsCursorLoader;
 
-public class ReadFragment extends SherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class ReadFragment extends SherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     PeriodicalsAdapter mPeriodicalsAdapter;
 
@@ -41,7 +39,7 @@ public class ReadFragment extends SherlockListFragment implements LoaderManager.
     }
 
     public void updateBooks() {
-
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override

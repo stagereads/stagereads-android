@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListFragment;
@@ -17,7 +18,7 @@ import com.econify.stagereads.PlayReader;
 import com.econify.stagereads.adapters.PeriodicalsAdapter;
 import com.econify.stagereads.loader.PeriodicalsCursorLoader;
 
-public class ReadFragment extends SherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ReadFragment extends SherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemLongClickListener {
 
     PeriodicalsAdapter mPeriodicalsAdapter;
 
@@ -38,26 +39,31 @@ public class ReadFragment extends SherlockListFragment implements LoaderManager.
         getLoaderManager().initLoader(0, null, this);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        getListView().setOnItemLongClickListener(this);
+    }
+
     public void updateBooks() {
-        getLoaderManager().restartLoader(0, null, this);
+        if (getActivity() != null) {
+            getLoaderManager().restartLoader(0, null, this);
+        }
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, final long id) {
 
-        Cursor item = (Cursor) l.getItemAtPosition(position);
-        final String urlString = item.getString(item.getColumnIndex("url"));
-        String hashed_resource = item.getString(item.getColumnIndex("hashed_resource"));
-
-        int downloaded = item.getInt(item.getColumnIndex("downloaded"));
-        String name = item.getString(item.getColumnIndex("name"));
-        String description = item.getString(item.getColumnIndex("description"));
+        Cursor cursor = (Cursor) l.getItemAtPosition(position);
+        int downloaded = cursor.getInt(cursor.getColumnIndex("downloaded"));
+        String hashed_resource = cursor.getString(cursor.getColumnIndex("hashed_resource"));
 
         if (!((Main) getActivity()).isSubscribed()) {
             Toast.makeText(getActivity(), "To read this play head over to the subscribe tab.", Toast.LENGTH_SHORT).show();
         } else if (downloaded < 1) {
 
-            showDownloadDialog(name, description, id, urlString);
+            showDownloadDialog(cursor);
 
         } else {
             Intent intent = new Intent(getActivity(), PlayReader.class);
@@ -66,11 +72,28 @@ public class ReadFragment extends SherlockListFragment implements LoaderManager.
         }
     }
 
-    private void showDownloadDialog(String name, String description, final long id, final String urlString) {
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+        showDownloadDialog((Cursor) adapterView.getItemAtPosition(i));
+
+        return true;
+    }
+
+    private void showDownloadDialog(Cursor cursor) {
+
+        final String urlString = cursor.getString(cursor.getColumnIndex("url"));
+        String hashed_resource = cursor.getString(cursor.getColumnIndex("hashed_resource"));
+
+        int downloaded = cursor.getInt(cursor.getColumnIndex("downloaded"));
+        String name = cursor.getString(cursor.getColumnIndex("name"));
+        String description = cursor.getString(cursor.getColumnIndex("description"));
+        final long id = cursor.getLong(cursor.getColumnIndex("_id"));
+
         Dialog dialog = new AlertDialog.Builder(getActivity())
                 .setTitle(name)
                 .setMessage(description)
-                .setPositiveButton("Download", new DialogInterface.OnClickListener() {
+                .setPositiveButton((downloaded > 0) ? "Re-Download" : "Download", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         ((Main) getActivity()).downloadPlay(id, urlString);

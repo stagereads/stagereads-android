@@ -178,8 +178,8 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
         mShopDB = ShopDB.getShopDB(this);
     }
 
-    public void downloadPlay(long id, String url) {
-        new DownloadFile(id).execute(url);
+    public void downloadPlay(String hashedResource, String url) {
+        new DownloadFile(hashedResource).execute(url);
     }
 
     private class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -272,10 +272,10 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
 
     private class DownloadFile extends AsyncTask<String, Integer, String> {
 
-        long mId;
+        String mHashedResource;
 
-        public DownloadFile(long id) {
-            mId = id;
+        public DownloadFile(String hashedResource) {
+            mHashedResource = hashedResource;
         }
 
         @Override
@@ -289,8 +289,7 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
 
                 // download the file
                 InputStream input = new BufferedInputStream(url.openStream());
-                String outpurFile = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
-                OutputStream output = openFileOutput(outpurFile, Context.MODE_PRIVATE);
+                OutputStream output = openFileOutput(mHashedResource, Context.MODE_PRIVATE);
 
                 byte data[] = new byte[1024];
                 long total = 0;
@@ -306,7 +305,7 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
                 output.close();
                 input.close();
 
-                mShopDB.setDownloaded(mId);
+                mShopDB.setDownloaded(mHashedResource);
             } catch (Exception e) {
                 e.printStackTrace();
             }

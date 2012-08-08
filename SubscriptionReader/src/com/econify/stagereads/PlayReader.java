@@ -49,16 +49,12 @@ public class PlayReader extends SherlockFragmentActivity {
         mShopDB = ShopDB.getShopDB(this);
         Cursor c = mShopDB.getPeriodicalFromResource(mBookId);
         c.moveToFirst();
-        String urlString = c.getString(c.getColumnIndex("url"));
-        try {
-            URL url = new URL(urlString);
 
-            String bookName = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
             // read epub file
             EpubReader epubReader = new EpubReader();
             Book book = null;
             try {
-                book = epubReader.readEpub(openFileInput(bookName));
+                book = epubReader.readEpub(openFileInput(mBookId));
 
                 BookPagerAdapter pagerAdapter = new BookPagerAdapter(book, getSupportFragmentManager());
                 mViewPager.setAdapter(pagerAdapter);
@@ -72,11 +68,6 @@ public class PlayReader extends SherlockFragmentActivity {
                 e.printStackTrace();
                 finish();
             }
-        } catch (MalformedURLException e) {
-            c.close();
-            e.printStackTrace();
-            finish();
-        }
 
     }
 

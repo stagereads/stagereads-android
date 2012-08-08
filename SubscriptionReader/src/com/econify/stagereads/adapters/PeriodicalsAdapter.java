@@ -2,12 +2,10 @@ package com.econify.stagereads.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.support.v4.widget.ResourceCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 public class PeriodicalsAdapter extends ResourceCursorAdapter {
@@ -50,8 +48,21 @@ public class PeriodicalsAdapter extends ResourceCursorAdapter {
         String name = cursor.getString(cursor.getColumnIndex("name"));
         holder.text1.setText(name);
 
+        String downloadDate = cursor.getString(cursor.getColumnIndex("download_date"));
+        String updated = cursor.getString(cursor.getColumnIndex("updated"));
+
         int downloaded = cursor.getInt(cursor.getColumnIndex("downloaded"));
-        holder.text2.setText((downloaded > 0) ? "Downloaded" : "Available");
+        String status = "";
+        if (downloaded > 0) {
+            if (downloadDate.equals(updated)) {
+                status = "Downloaded";
+            } else {
+                status = "Update Available";
+            }
+        } else {
+            status = "Available";
+        }
+        holder.text2.setText(status);
 
         return convertView;
     }

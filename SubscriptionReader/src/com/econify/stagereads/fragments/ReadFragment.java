@@ -83,7 +83,7 @@ public class ReadFragment extends SherlockListFragment implements LoaderManager.
     private void showDownloadDialog(Cursor cursor) {
 
         final String urlString = cursor.getString(cursor.getColumnIndex("url"));
-        String hashed_resource = cursor.getString(cursor.getColumnIndex("hashed_resource"));
+        final String hashed_resource = cursor.getString(cursor.getColumnIndex("hashed_resource"));
 
         int downloaded = cursor.getInt(cursor.getColumnIndex("downloaded"));
         String name = cursor.getString(cursor.getColumnIndex("name"));
@@ -96,7 +96,7 @@ public class ReadFragment extends SherlockListFragment implements LoaderManager.
                 .setPositiveButton((downloaded > 0) ? "Re-Download" : "Download", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ((Main) getActivity()).downloadPlay(id, urlString);
+                        ((Main) getActivity()).downloadPlay(hashed_resource, urlString);
                         dialogInterface.dismiss();
                     }
                 })

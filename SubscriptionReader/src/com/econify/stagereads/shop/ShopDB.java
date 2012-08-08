@@ -39,6 +39,11 @@ public class ShopDB {
                 instance.mDatabase.setVersion(3);
                 instance.mDatabase.execSQL("ALTER TABLE periodicals ADD COLUMN page INT DEFAULT 0");
             }
+            if (version < 4) {
+                instance.mDatabase.setVersion(4);
+                instance.mDatabase.execSQL("ALTER TABLE periodicals ADD COLUMN download_date INT DEFAULT 0");
+                instance.mDatabase.execSQL("UPDATE periodicals SET download_date = updated");
+            }
         }
         return instance;
     }
@@ -56,7 +61,7 @@ public class ShopDB {
 
     public void insertPurchase(int id, String hashed_resource, String name, String description, String url, long updated, long created) {
         mDatabase
-                .execSQL("INSERT OR REPLACE INTO periodicals (_id, hashed_resource, name, description, url, updated, created, downloaded, page) VALUES ("
+                .execSQL("INSERT OR REPLACE INTO periodicals (_id, hashed_resource, name, description, url, updated, created, downloaded, page, download_date) VALUES ("
                         + id
                         + ", '"
                         + hashed_resource
@@ -74,6 +79,8 @@ public class ShopDB {
                         + "(SELECT downloaded from periodicals where _id = "
                         + id + "), "
                         + "(SELECT page from periodicals where _id = "
+                        + id + "), "
+                        + "(SELECT download_date from periodicals where _id = "
                         + id + ")"
                         + ")");
     }
@@ -86,11 +93,11 @@ public class ShopDB {
         return mDatabase.rawQuery("SELECT * FROM periodicals WHERE downloaded = 1", null);
     }
 
-    public void setDownloaded(long id) {
+    public void setDownloaded(String hashedResource) {
         ContentValues values = new ContentValues();
         values.put("downloaded", 1);
-        int result = mDatabase.update("periodicals", values, "_id = ?", new String[]{"" + id});
-        Log.d("", "" + result);
+        mDatabase.update("periodicals", values, "hashed_resource = ?", new String[]{hashedResource});
+        mDatabase.rawExecSQL("UPDATE periodicals SET download_date = updated WHERE hashed_resource = '" + hashedResource + "'");
     }
 
     public boolean isSubscribed(String id) {

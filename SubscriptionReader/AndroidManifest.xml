@@ -20,6 +20,8 @@
 
         <activity android:name="PlayReader" />
 
+        <activity android:name="com.crittercism.NotificationActivity"/>
+
         <service android:name=".shop.BillingService"/>
 
         <receiver android:name=".shop.BillingReceiver">

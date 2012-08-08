@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import com.crittercism.app.Crittercism;
 
 public class Main extends SherlockFragmentActivity implements ActionBar.TabListener {
 
@@ -57,6 +58,8 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Crittercism.init(getApplicationContext(), "4fec9748be790e1707000001");
 
         setContentView(R.layout.main);
 

@@ -3,43 +3,20 @@ package com.econify.stagereads.adapters;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.support.v4.widget.ResourceCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-public class PeriodicalsAdapter implements ListAdapter {
+public class PeriodicalsAdapter extends ResourceCursorAdapter {
 
-    private Cursor mCursor;
     private LayoutInflater mInflater;
 
-    public PeriodicalsAdapter(Context context, Cursor cursor) {
-        mCursor = cursor;
-
+    public PeriodicalsAdapter(Context context) {
+        super(context, 0, null, 0);
         mInflater = LayoutInflater.from(context);
-    }
-
-    @Override
-    public int getCount() {
-        return mCursor.getCount();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        mCursor.moveToPosition(position);
-        return mCursor;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        mCursor.moveToPosition(position);
-        return mCursor.getLong(mCursor.getColumnIndex("_id"));
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return 0;
     }
 
     private class ViewHolder {
@@ -68,51 +45,19 @@ public class PeriodicalsAdapter implements ListAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        mCursor.moveToPosition(position);
-        String name = mCursor.getString(mCursor.getColumnIndex("name"));
+        Cursor cursor = getCursor();
+        cursor.moveToPosition(position);
+        String name = cursor.getString(cursor.getColumnIndex("name"));
         holder.text1.setText(name);
 
-        int downloaded = mCursor.getInt(mCursor.getColumnIndex("downloaded"));
+        int downloaded = cursor.getInt(cursor.getColumnIndex("downloaded"));
         holder.text2.setText((downloaded > 0) ? "Downloaded" : "Available");
 
         return convertView;
     }
 
     @Override
-    public int getViewTypeCount() {
-        return 1;
-    }
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public void registerDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
+    public void bindView(View view, Context context, Cursor cursor) {
 
     }
-
-    @Override
-    public void unregisterDataSetObserver(DataSetObserver observer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean areAllItemsEnabled() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        return true;
-    }
-
 }

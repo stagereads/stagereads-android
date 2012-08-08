@@ -144,6 +144,9 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
         mObserver = new SubscriptionPurchaseObserver(mHandler);
         ResponseHandler.register(mObserver);
 
+        mSubscribed = mShopDB.isSubscribed("3c2b0083a748dc9cfad7e068e607162521432208");
+        mShopFragment.updateSubscriptionStatus();
+
         updatePeriodicalLists();
 
         new LoadItems().execute();
@@ -156,8 +159,15 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
         ResponseHandler.unregister(mObserver);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mBillingService.unbind();
+    }
+
     private void updatePeriodicalLists() {
-        mReadFragment.updateBooks(this, mShopDB.getPeriodicals());
+        mReadFragment.updateBooks();
     }
 
     public boolean isSubscribed() {
@@ -166,14 +176,6 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
 
     private void InitializeSQLCipher() {
         mShopDB = ShopDB.getShopDB(this);
-
-        mSubscribed = mShopDB.isSubscribed("3c2b0083a748dc9cfad7e068e607162521432208");
-        mShopFragment.updateSubscriptionStatus();
-
-        Cursor cursor = mShopDB.getDownloadedPeriodicals();
-        this.startManagingCursor(cursor);
-        ListAdapter adapter = new PeriodicalsAdapter(this, cursor);
-        //setListAdapter(adapter);
     }
 
     public void downloadPlay(long id, String url) {

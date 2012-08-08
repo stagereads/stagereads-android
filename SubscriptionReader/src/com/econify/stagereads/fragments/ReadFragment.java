@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -14,20 +17,31 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.econify.stagereads.Main;
 import com.econify.stagereads.PlayReader;
 import com.econify.stagereads.adapters.PeriodicalsAdapter;
+import com.econify.stagereads.loader.PeriodicalsCursorLoader;
 
-public class ReadFragment extends SherlockListFragment {
+public class ReadFragment extends SherlockListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+
+    PeriodicalsAdapter mPeriodicalsAdapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+        // Give some text to display if there is no data.  In a real
+        // application this would come from a resource.
+        setEmptyText("No Periodicals");
 
+        // Create an empty adapter we will use to display the loaded data.
+        mPeriodicalsAdapter = new PeriodicalsAdapter(getActivity());
+        setListAdapter(mPeriodicalsAdapter);
+
+        // Prepare the loader.  Either re-connect with an existing one,
+        // or start a new one.
+        getLoaderManager().initLoader(0, null, this);
     }
 
+    public void updateBooks() {
 
-    public void updateBooks(Context context, Cursor cursor) {
-        PeriodicalsAdapter adapter = new PeriodicalsAdapter(context, cursor);
-        setListAdapter(adapter);
     }
 
     @Override
@@ -73,5 +87,20 @@ public class ReadFragment extends SherlockListFragment {
                 })
                 .create();
         dialog.show();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new PeriodicalsCursorLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        mPeriodicalsAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mPeriodicalsAdapter.swapCursor(null);
     }
 }

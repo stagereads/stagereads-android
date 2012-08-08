@@ -98,8 +98,10 @@ public class ShopDB {
         if (c.getCount() > 0) {
             c.moveToFirst();
             int value = c.getInt(c.getColumnIndex("subscribed"));
+            c.close();
             return value > 0;
         }
+        c.close();
         return false;
     }
 

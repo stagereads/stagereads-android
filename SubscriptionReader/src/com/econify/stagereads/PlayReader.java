@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.econify.stagereads.adapters.BookPagerAdapter;
 import com.econify.stagereads.shop.ShopDB;
@@ -29,7 +30,7 @@ public class PlayReader extends SherlockFragmentActivity {
 
         setContentView(R.layout.bookreader);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
     }
@@ -76,6 +77,18 @@ public class PlayReader extends SherlockFragmentActivity {
         super.onPause();
 
         mShopDB.setLastPage(mBookId, mViewPager.getCurrentItem());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("Table Of Contents").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                return true;
+            }
+        }).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        return true;
     }
 
     @Override

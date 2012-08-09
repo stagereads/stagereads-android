@@ -59,7 +59,7 @@ public class Main extends SherlockFragmentActivity implements ActionBar.TabListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Crittercism.init(getApplicationContext(), "4fec9748be790e1707000001");
+        Crittercism.init(getApplicationContext(), "5021736ac8f97411fc000006");
 
         setContentView(R.layout.main);
 

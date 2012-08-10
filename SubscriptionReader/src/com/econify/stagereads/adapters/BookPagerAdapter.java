@@ -22,27 +22,10 @@ public class BookPagerAdapter extends FragmentPagerAdapter {
     Book mBook;
     List<Resource> contents;
 
-    public BookPagerAdapter(Book book, FragmentManager fm) {
+    public BookPagerAdapter(List<Resource> contents, FragmentManager fm) {
         super(fm);
 
-        mBook = book;
-        contents = new ArrayList<Resource>();
-        List<TOCReference> references = book.getTableOfContents().getTocReferences();
-
-        for (TOCReference ref : references) {
-            List<TOCReference> ref2 = ref.getChildren();
-            if (ref2 != null && ref2.size() > 0) {
-                String id = "";
-                for (TOCReference ref3 : ref2) {
-                    if (ref3.getResource().getId() != id) {
-                        contents.add(ref3.getResource());
-                        id = ref3.getResource().getId();
-                    }
-                }
-            } else {
-                contents.add(ref.getResource());
-            }
-        }
+        this.contents = contents;
     }
 
     @Override

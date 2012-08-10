@@ -1,5 +1,7 @@
 package com.econify.stagereads;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,11 +12,13 @@ import com.actionbarsherlock.view.MenuItem;
 import com.econify.stagereads.adapters.BookPagerAdapter;
 import com.econify.stagereads.shop.ShopDB;
 import nl.siegmann.epublib.domain.Book;
+import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.epub.EpubReader;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayReader extends SherlockFragmentActivity {
 
@@ -23,6 +27,9 @@ public class PlayReader extends SherlockFragmentActivity {
     ShopDB mShopDB;
 
     String mBookId;
+
+    List<Resource> contents;
+    List<CharSequence> tocItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,24 +58,26 @@ public class PlayReader extends SherlockFragmentActivity {
         Cursor c = mShopDB.getPeriodicalFromResource(mBookId);
         c.moveToFirst();
 
-            // read epub file
-            EpubReader epubReader = new EpubReader();
-            Book book = null;
-            try {
-                book = epubReader.readEpub(openFileInput(mBookId));
+        // read epub file
+        EpubReader epubReader = new EpubReader();
+        Book book = null;
+        try {
+            book = epubReader.readEpub(openFileInput(mBookId));
 
-                BookPagerAdapter pagerAdapter = new BookPagerAdapter(book, getSupportFragmentManager());
-                mViewPager.setAdapter(pagerAdapter);
+            loadBookContents(book);
 
-                int page = c.getInt(c.getColumnIndex("page"));
-                c.close();
-                mViewPager.setCurrentItem(page);
+            BookPagerAdapter pagerAdapter = new BookPagerAdapter(contents, getSupportFragmentManager());
+            mViewPager.setAdapter(pagerAdapter);
 
-            } catch (IOException e) {
-                c.close();
-                e.printStackTrace();
-                finish();
-            }
+            int page = c.getInt(c.getColumnIndex("page"));
+            c.close();
+            mViewPager.setCurrentItem(page);
+
+        } catch (IOException e) {
+            c.close();
+            e.printStackTrace();
+            finish();
+        }
 
     }
 
@@ -84,7 +93,7 @@ public class PlayReader extends SherlockFragmentActivity {
         menu.add("Table Of Contents").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-
+                showTOCDialog();
                 return true;
             }
         }).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -106,5 +115,40 @@ public class PlayReader extends SherlockFragmentActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showTOCDialog() {
+        final CharSequence[] items = tocItems.toArray(new CharSequence[tocItems.size()]);
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Table of Contents").setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                  mViewPager.setCurrentItem(i, false);
+            }
+        }).create();
+        dialog.show();
+    }
+
+    private void loadBookContents(Book book) {
+
+        contents = new ArrayList<Resource>();
+        List<TOCReference> references = book.getTableOfContents().getTocReferences();
+        tocItems = new ArrayList<CharSequence>();
+
+        for (TOCReference ref : references) {
+            List<TOCReference> ref2 = ref.getChildren();
+            if (ref2 != null && ref2.size() > 0) {
+                String id = "";
+                for (TOCReference ref3 : ref2) {
+                    if (ref3.getResource().getId() != id) {
+                        contents.add(ref3.getResource());
+                        tocItems.add(ref3.getTitle());
+                        id = ref3.getResource().getId();
+                    }
+                }
+            } else {
+                contents.add(ref.getResource());
+                tocItems.add(ref.getTitle());
+            }
+        }
     }
 }

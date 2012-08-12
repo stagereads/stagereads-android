@@ -1,6 +1,7 @@
 package com.econify.stagereads;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,9 +14,13 @@ import com.econify.stagereads.adapters.BookPagerAdapter;
 import com.econify.stagereads.shop.ShopDB;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.domain.Resources;
 import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.epub.EpubReader;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +70,9 @@ public class PlayReader extends SherlockFragmentActivity {
             book = epubReader.readEpub(openFileInput(mBookId));
 
             loadBookContents(book);
+            extractResources(book);
 
-            BookPagerAdapter pagerAdapter = new BookPagerAdapter(contents, getSupportFragmentManager());
+            BookPagerAdapter pagerAdapter = new BookPagerAdapter(mBookId, contents, getSupportFragmentManager());
             mViewPager.setAdapter(pagerAdapter);
 
             int page = c.getInt(c.getColumnIndex("page"));
@@ -80,6 +86,8 @@ public class PlayReader extends SherlockFragmentActivity {
         }
 
     }
+
+
 
     @Override
     public void onPause() {
@@ -149,6 +157,36 @@ public class PlayReader extends SherlockFragmentActivity {
                 contents.add(ref.getResource());
                 tocItems.add(ref.getTitle());
             }
+        }
+    }
+
+    private void extractResources(Book book) {
+
+        List<Resource> images = new ArrayList<Resource>();
+
+        Resources ress = book.getResources();
+        for (Resource res : ress.getAll()) {
+            if (res.getMediaType().getName().contains("image/") || res.getMediaType().getName().contains("text/css")) {
+                extractResource(res);
+            }
+        }
+    }
+
+    private void extractResource(Resource res) {
+
+        FileOutputStream fos = null;
+        try {
+            File bookDir = new File(getFilesDir() + "/" + mBookId  + "-images/");
+            if (bookDir.exists() == false) {
+                bookDir.mkdirs();
+            }
+            fos = new FileOutputStream(new File(bookDir, res.getId()));
+            fos.write(res.getData());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 }

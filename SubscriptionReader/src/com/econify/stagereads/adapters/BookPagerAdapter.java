@@ -4,28 +4,31 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import com.econify.stagereads.R;
+import com.econify.stagereads.Util;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.domain.TOCReference;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookPagerAdapter extends FragmentPagerAdapter {
 
-    Book mBook;
+    String mBookId;
     List<Resource> contents;
 
-    public BookPagerAdapter(List<Resource> contents, FragmentManager fm) {
+    public BookPagerAdapter(String bookId, List<Resource> contents, FragmentManager fm) {
         super(fm);
 
         this.contents = contents;
+        mBookId = bookId;
     }
 
     @Override
@@ -49,19 +52,29 @@ public class BookPagerAdapter extends FragmentPagerAdapter {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-            View view = inflater.inflate(R.layout.bookpagefragment, null);
-
-            WebView webView = (WebView) view.findViewById(R.id.webview);
+            WebView webView = new WebView(getActivity());
 
             try {
                 String pageData = new String(page.getData());
-                webView.loadData(pageData, "text/html", null);
+                pageData = updateResource(pageData);
+                webView.loadDataWithBaseURL("file://" + getActivity().getFilesDir() + "/" + mBookId + "-images/", pageData, "text/html", null, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            return view;
+            return webView;
 
         }
+    }
+
+    private String updateResource(String pageData) {
+
+        Document doc = Jsoup.parse(pageData);
+        for (Element el : doc.select("img")) {
+            String src = el.attr("src");
+            src = Util.extractFileName(src);
+            el.attr("src", src);
+        }
+        return doc.toString();
     }
 }

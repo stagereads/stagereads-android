@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,7 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.util.List;
 
-public class BookPagerAdapter extends FragmentPagerAdapter {
+public class BookPagerAdapter extends FragmentStatePagerAdapter {
 
     String mBookId;
     List<Resource> contents;

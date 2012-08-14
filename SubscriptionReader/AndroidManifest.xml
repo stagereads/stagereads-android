@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="PlayReader" />
+        <activity android:name="PlayReader" android:configChanges="keyboardHidden|orientation|screenSize"/>
 
         <activity android:name="com.crittercism.NotificationActivity"/>
 

@@ -43,6 +43,10 @@ public class BookPagerAdapter extends FragmentStatePagerAdapter {
 
         Resource page;
 
+        public BookPageFragment() {
+
+        }
+
         public BookPageFragment(Resource resource) {
             page = resource;
         }

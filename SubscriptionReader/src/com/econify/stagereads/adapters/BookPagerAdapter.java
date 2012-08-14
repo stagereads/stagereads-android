@@ -39,7 +39,7 @@ public class BookPagerAdapter extends FragmentStatePagerAdapter {
         return contents.size();
     }
 
-    private class BookPageFragment extends Fragment {
+    public class BookPageFragment extends Fragment {
 
         Resource page;
 

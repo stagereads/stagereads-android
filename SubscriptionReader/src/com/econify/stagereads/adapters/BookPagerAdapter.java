@@ -3,15 +3,12 @@ package com.econify.stagereads.adapters;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import com.econify.stagereads.Util;
-import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -75,6 +72,11 @@ public class BookPagerAdapter extends FragmentStatePagerAdapter {
             String src = el.attr("src");
             src = Util.extractFileName(src);
             el.attr("src", src);
+        }
+        for (Element el : doc.select("link")) {
+            String href = el.attr("href");
+            href = Util.extractFileName(href);
+            el.attr("href", href);
         }
         return doc.toString();
     }

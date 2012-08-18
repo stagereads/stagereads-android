@@ -1,6 +1,6 @@
 android update project -p ./SubscriptionReader -s
 
-rm ./ActionBarSherlock/library/build.xml
+rm -f ./ActionBarSherlock/library/build.xml
 android update project -p ./ActionBarSherlock/library
 
 cd ./SubscriptionReader
